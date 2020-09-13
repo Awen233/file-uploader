@@ -1,0 +1,29 @@
+Question 1:
+a
+i
+the expect value of weight increases if the wolves' length x increases. 
+ii
+increase in a similar patten
+iii
+
+c
+y-hat = -16.46 + 35.02 * 1.4 = 32.568
+y - y-hat = -9.67.   y = y-hat - 9.67 = 22.898
+
+Question 2:
+p is the proportion of people who fill cup with a soft drink with water cup
+p-hat is estimate for p. is 23/80
+sd(p-hat) = sqrt(23/80 * 57/80/80) = 0.0506
+0.2875 + 0.0506 = 0.3381
+0.2875 - 0.0506 = 0.2369
+CI is 0.2369, 0.3381
+
+3000 *  0.2369 = 710.1 * 0.25 = 177.5
+3000 * 0.3381 = 1014.3 * 0.25 = 253.575
+
+
+Question 3
+
+
+
+ 
