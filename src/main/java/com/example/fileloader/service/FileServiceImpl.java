@@ -1,16 +1,20 @@
 package com.example.fileloader.service;
+import com.example.fileloader.FileloaderApplication;
 import com.example.fileloader.dao.FileDAO;
+import com.example.fileloader.entity.FileDTO;
 import com.example.fileloader.entity.FileMeta;
-import com.example.fileloader.exceptions.FileNotFoundException;
+import com.example.fileloader.exceptions.MyFileNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -21,7 +25,9 @@ import java.util.Optional;
 @Service
 public class FileServiceImpl implements FileService {
 
-    FileDAO fileDAO;
+    private final FileDAO fileDAO;
+    private static final Logger logger= LoggerFactory.getLogger(FileloaderApplication.class);
+
 
     @Value("${file.location}")
     String file_location;
@@ -32,12 +38,13 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public String uploadFile(MultipartFile file) {
+    public FileDTO uploadFile(MultipartFile file) {
+        logger.info("start uploadFile service");
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         String fileType = file.getContentType();
         long size = file.getSize();
         FileMeta fileMeta = new FileMeta(fileName, fileType, size);
-        fileDAO.save(fileMeta);
+        FileMeta meta = storeFileMeta(fileMeta);
 
         Path path = Paths.get(file_location + fileName);
         try {
@@ -49,43 +56,37 @@ public class FileServiceImpl implements FileService {
                 .path("/files/")
                 .path(fileName)
                 .toUriString();
-        return fileDownloadUri;
+        return new FileDTO(meta.getId(), fileDownloadUri);
     }
 
+    @Transactional
+    public FileMeta storeFileMeta(FileMeta fileMeta){
+        logger.info("store the file's meta data");
+        return fileDAO.save(fileMeta);
+    }
+
+
+    @Transactional
     @Override
     public FileMeta getMetaById(long id) {
+        logger.info("start the get meta data service");
         Optional<FileMeta> res = fileDAO.findById(id);
         if(!res.isPresent()){
-            throw new FileNotFoundException("meta data with id " + id + " not found");
+            throw new MyFileNotFoundException("meta data with id " + id + " not found");
         }
         FileMeta meta = res.get();
         return meta;
     }
 
     @Override
-    public String downloadFile(String fileName) {
-        String fileLocation = file_location + fileName;
-        InputStream fis = null;
-        try {
-            fis = new FileInputStream(fileLocation);
-        } catch (java.io.FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        InputStreamReader isr = new InputStreamReader(fis, StandardCharsets.UTF_8);
-        BufferedReader br = new BufferedReader(isr);
-        String line;
-        StringBuilder data = new StringBuilder();
-        try{
-            while ((line = br.readLine()) != null) {
-                data.append(line);
-                data.append("\n");
-            }
-        } catch (java.io.IOException e){
-            e.printStackTrace();
-        }
-        return data.toString();
+    public File loadFileAsResource(String fileName){
+        logger.info("start loading the resources");
+        String fileURL = file_location + fileName;
+        File file = new File(fileURL);
+        return file;
     }
 
+    @Transactional
     @Override
     public List<FileMeta> findFileMetaBiggerOrEqual(long id) {
         List<FileMeta> res = fileDAO.findFileMetaBiggerOrEqual(id);

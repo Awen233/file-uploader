@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class ControllerExceptionHandler {
 
     @ExceptionHandler
-    public ResponseEntity handleException(FileNotFoundException exc){
+    public ResponseEntity handleException(MyFileNotFoundException exc){
         return new ResponseEntity(exc.getMessage(), HttpStatus.NOT_FOUND);
     }
 

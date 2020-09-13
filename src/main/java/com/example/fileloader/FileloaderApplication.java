@@ -14,10 +14,4 @@ public class FileloaderApplication {
 		SpringApplication.run(FileloaderApplication.class, args);
 	}
 
-
-
-	@Bean
-	public RestTemplate getRestTemplate() {
-		return new RestTemplate();
-	}
 }

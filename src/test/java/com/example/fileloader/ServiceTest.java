@@ -19,7 +19,7 @@ public class ServiceTest {
 
     @Test
     public void controllerCheck() throws Exception {
-        assertThat(service.downloadFile("test.txt")).isNotNull();
+        assertThat(service.loadFileAsResource("test.txt")).isNotNull();
     }
 
 }
