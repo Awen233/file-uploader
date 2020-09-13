@@ -23,7 +23,7 @@ public class FileServiceImpl implements FileService {
 
     FileDAO fileDAO;
 
-    @Value("file.location")
+    @Value("${file.location}")
     String file_location;
 
     @Autowired
@@ -49,7 +49,6 @@ public class FileServiceImpl implements FileService {
                 .path("/files/")
                 .path(fileName)
                 .toUriString();
-        System.out.println(fileDownloadUri);
         return fileDownloadUri;
     }
 
@@ -57,7 +56,6 @@ public class FileServiceImpl implements FileService {
     public FileMeta getMetaById(long id) {
         Optional<FileMeta> res = fileDAO.findById(id);
         if(!res.isPresent()){
-            System.out.println("not fount");
             throw new FileNotFoundException("meta data with id " + id + " not found");
         }
         FileMeta meta = res.get();
